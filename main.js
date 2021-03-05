@@ -23,25 +23,16 @@ export default class Main {
 
         this.scene =  new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 1000);
-        // 4 param -> lenght of the focale, ratio of the scene (here the size of the window), the clayping (ce qui va etre calculé dans la scene)
+        // 4 param -> lenght of the focale, ratio of the scene (here the size of the window), the clayping (what will be calculated in the scene)
 
         this.renderer = new THREE.WebGLRenderer({antialias:true} /*{alpha:true}*/);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         // si le canvas n'est pas spécifié il sera crée automatiquement
 
-        
-        // creation d'un cube ⬇
-        
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-        this.cube =  new THREE.Mesh(geometry, material);
-        this.scene.add(this.cube);
 
         this.camera.position.z = 2;
         
-        this.cube.position.x = -.5;
 
-        this.cube.rotation.y = Math.PI / 4 ;
         
         window.addEventListener('resize', this.onResize, false);
         document.body.appendChild(this.renderer.domElement);
@@ -53,8 +44,27 @@ export default class Main {
 
 
         this.update();
+
+        this.initObject();
     }
 
+    initObject(){
+        this.boxGeometry = new THREE.BoxGeometry(1,1,1);
+        const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
+
+        this.sphereGeometry = new THREE.SphereGeometry(1,12,12);
+        const materialColorGreen = new THREE.MeshBasicMaterial({color: 0x00ff00});
+
+        this.boxMesh = new THREE.Mesh(this.boxGeometry, materialColor);
+        this.sphereMesh = new THREE.Mesh(this.sphereGeometry,materialColorGreen);
+
+
+
+
+        this.sphereMesh.position.x = -3;
+        this.sphereMesh.scale.set(.1,1,.1);
+        this.scene.add(this.boxMesh, this.sphereMesh);
+    }
 
     onResize(){
 
@@ -79,6 +89,8 @@ export default class Main {
         this.Stats.update();
 
     }
+
+
 }
  new Main();
 
