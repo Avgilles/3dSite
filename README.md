@@ -1,2 +1,2 @@
 # 3dSite
-A short website whith tree.js Frameworks
+A short website with tree.js Frameworks
