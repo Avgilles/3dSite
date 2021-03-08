@@ -109,7 +109,19 @@ this.yourMesh.scale.z = Math.PI / 4 ;
 this.yourMesh.scale.z = Math.Math.degToRad(45);
 ```
 
+### clone an object
 
+```js
+this.yourParentMesh = new THREE.Mesh(this.)
+
+```
+
+### Visible
+
+```js
+//to turn off the visibility of youre object
+this.yourMesh.visible = false;
+```
 
 ***
 ### long story short ###
