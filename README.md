@@ -63,14 +63,23 @@ All the scene will render in a canvas tag, if it's not create three.js will auto
 ### Create a object ###
  ```js
 // for sphere
-this.sphereGeometry = new THREE.SphereGeometry(1,12,12);
+this.yourSphereGeometry = new THREE.SphereGeometry(1,12,12);
 // for box
-this.boxGeometry = new THREE.BoxGeometry(1,12,12);
+this.yourBoxGeometry = new THREE.BoxGeometry(1,12,12);
 ```
 ###Assign material ####
 You can use MeshBasicMaterial to assign a color
  ```js
-const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
+const yourMaterialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
+```
+### create the object and place it in to the scene
+```js
+                                 // 👇 the mesh      👇 the material
+this.boxMesh = new THREE.Mesh(this.yourBoxGeometry ,yourMaterialColor );
+
+// add to the scene
+this.scene.add(this.boxMesh);
+
 ```
 
 There are 3 differents parameters for all object :
@@ -96,6 +105,8 @@ this.yourMesh.rotation.y = 25 ;
 this.yourMesh.scale.set(.1,1,.1);
 //Only Z axes
 this.yourMesh.scale.z = Math.PI / 4 ;
+// use degres rotation
+this.yourMesh.scale.z = Math.Math.degToRad(45);
 ```
 
 
