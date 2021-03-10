@@ -1,7 +1,7 @@
 import * as THREE from "./lib/three.module.js";
 import {OrbitControls} from "./lib/OrbitControls.js";
 import Stats from "./lib/stats.module.js";
-
+import Objects from "./Objects.js";
 
 export default class Main {
 
@@ -16,7 +16,7 @@ export default class Main {
         this.renderer;
 
         this.init();
-    
+
     }
 
     init(){
@@ -31,9 +31,9 @@ export default class Main {
 
 
         this.camera.position.z = 2;
-        
 
-        
+
+
         window.addEventListener('resize', this.onResize, false);
         document.body.appendChild(this.renderer.domElement);
 
@@ -49,21 +49,8 @@ export default class Main {
     }
 
     initObject(){
-        this.boxGeometry = new THREE.BoxGeometry(1,1,1);
-        const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
-
-        this.sphereGeometry = new THREE.SphereGeometry(1,12,12);
-        const materialColorGreen = new THREE.MeshBasicMaterial({color: 0x00ff00});
-
-        this.boxMesh = new THREE.Mesh(this.boxGeometry, materialColor);
-        this.sphereMesh = new THREE.Mesh(this.sphereGeometry,materialColorGreen);
-
-
-
-
-        this.sphereMesh.position.x = -3;
-        this.sphereMesh.scale.set(.1,1,.1);
-        this.scene.add(this.boxMesh, this.sphereMesh);
+        this.objects = new Objects();
+        this.scene.add(this.objects);
     }
 
     onResize(){

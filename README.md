@@ -113,7 +113,6 @@ this.yourMesh.scale.z = Math.Math.degToRad(45);
 
 ```js
 this.yourParentMesh = new THREE.Mesh(this.)
-
 ```
 
 ### Visible
@@ -122,104 +121,23 @@ this.yourParentMesh = new THREE.Mesh(this.)
 //to turn off the visibility of youre object
 this.yourMesh.visible = false;
 ```
+### Create a group of object
+Thanks to the group object we can organize more easely the scene, for example we can create level.
+Like the mesh, the Object3D have a lot of param we can use.
 
-***
-### long story short ###
-The final code setUp :
 ```js
-import * as THREE from "./lib/three.module.js";
-import {OrbitControls} from "./lib/OrbitControls.js";
-import Stats from "./lib/stats.module.js";
+this.groupe = new THREE.Object3D();
 
+this.groupe.add(this.yourMesh1, this.yourMesh2);
 
-export default class Main {
-
-    constructor(){
-
-        this.update = this.update.bind(this);
-        this.onResize = this.update.bind(this);
-        // this method allows to use the functions of the scopes here.
-
-        this.scene;
-        this.camera;
-        this.renderer;
-
-        this.init();
-    
-    }
-
-    init(){
-
-        this.scene =  new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 1000);
-        // 4 param -> lenght of the focale, ratio of the scene (here the size of the window), the clayping (what will be calculated in the scene)
-
-        this.renderer = new THREE.WebGLRenderer({antialias:true} /*{alpha:true}*/);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        // si le canvas n'est pas spécifié il sera crée automatiquement
-
-        this.camera.position.z = 2;
-        
-        window.addEventListener('resize', this.onResize, false);
-        document.body.appendChild(this.renderer.domElement);
-
-        this.Stats= new Stats();
-        document.body.appendChild(this.Stats.dom);
-
-        this.OrbitControls= new OrbitControls(this.camera, this.renderer.domElement);
-
-
-        this.update();
-        this.initObject();
-    }
-
-    initObject(){
-
-        this.boxGeometry = new THREE.BoxGeometry(1,1,1);
-        const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
-
-        this.sphereGeometry = new THREE.SphereGeometry(1,12,12);
-        const materialColorGreen = new THREE.MeshBasicMaterial({color: 0x00ff00});
-
-        this.boxMesh = new THREE.Mesh(this.boxGeometry, materialColor);
-        this.sphereMesh = new THREE.Mesh(this.sphereGeometry,materialColorGreen);
-
-        this.sphereMesh.position.x = -3;
-        this.sphereMesh.scale.set(.1,1,.1);
-        this.scene.add(this.boxMesh, this.sphereMesh);
-    }
-
-    onResize(){
-
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);
-
-    }
-
-
-    update(){
-        console.log("update");
-        requestAnimationFrame(this.update);
-        // this.cube.rotation.y += 0.01;
-
-        this.renderer.render(this.scene, this.camera);
-        this.Stats.update();
-
-    }
-
-
-}
-new Main();
-
+this.scene.add(this.groupe);
 
 ```
-With this setup you will have 2 objects with different material, where you can navigate with orbital control and the size of the canvas is responsive.
+***
 
-![Basic setUp](assets/doc/basicSetup.png "basic setup")
+Now the visual of this commit : 
+
+![Basic setUp](assets/doc/basicSetup2.png "basic setup")
 
 Right now it is not very impressive, but it is a good start.
 
