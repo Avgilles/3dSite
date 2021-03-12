@@ -112,7 +112,7 @@ this.yourMesh.scale.z = Math.Math.degToRad(45);
 ### clone an object
 
 ```js
-this.yourParentMesh = new THREE.Mesh(this.)
+this.yourParentMesh = new THREE.Mesh(this.yourParentMesh);
 ```
 
 ### Visible
@@ -133,11 +133,30 @@ this.groupe.add(this.yourMesh1, this.yourMesh2);
 this.scene.add(this.groupe);
 
 ```
+### import Object 
+
+There is many format in 3d, the most commun are fbx or obj.
+But there is an extension for the web named "gltf" created for the web.
+On blender we can export directly in the soft. 
+If you don't use blender you can export you 3d model in fbx and converted with online tools :
+[https://blackthread.io/gltf-converter/](https://blackthread.io/gltf-converter/)
+
+We use this extension because is less heavy.
+
+In three.js a mesh in gltf is a group of object :
+![Console.log GLTF object](assets/doc/objectMeshgltf.PNG "basic setup")
+There are many option in this object, but now for importing the mesh we use scene/children and we map the all array. 
+
+Note :
+Your 3d model can't have to mush voxel,
+simulation in VDB are not supported
+
+
 ***
 
 Now the visual of this commit : 
 
-![Basic setUp](assets/doc/basicSetup2.png "basic setup")
+![Basic setUp](assets/doc/basicSetup3.png "basic setup")
 
 Right now it is not very impressive, but it is a good start.
 

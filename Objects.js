@@ -25,6 +25,8 @@ export default class Objects extends THREE.Object3D {
         this.planeMesh.rotation.x = THREE.Math.degToRad(-90);
         this.planeMesh.position.y = -1;
 
+        this.boxMesh.position.x =  -1;
+
         // adding to objects class, later in init object we will add this to the scene.
         this.add(this.boxMesh);
         this.add(this.planeMesh);

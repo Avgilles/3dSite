@@ -2,6 +2,7 @@ import * as THREE from "./lib/three.module.js";
 import {OrbitControls} from "./lib/OrbitControls.js";
 import Stats from "./lib/stats.module.js";
 import Objects from "./Objects.js";
+import Tree from "./tree.js";
 
 export default class Main {
 
@@ -51,6 +52,10 @@ export default class Main {
     initObject(){
         this.objects = new Objects();
         this.scene.add(this.objects);
+
+        this.tree = new Tree();
+
+        this.scene.add(this.tree);
     }
 
     onResize(){
