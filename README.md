@@ -147,6 +147,105 @@ In three.js a mesh in gltf is a group of object :
 ![Console.log GLTF object](assets/doc/objectMeshgltf.PNG "basic setup")
 There are many option in this object, but now for importing the mesh we use scene/children and we map the all array. 
 
+there is 2 way to organise your asset :
+
+1.Use different file for each object 
+
+![one object](assets/doc/1object.PNG)
+
+#### Don't forget to set the position of the object at zero ! ####
+
+```js
+import * as THREE from "./lib/three.module.js";
+import {GLTFLoader} from './lib/GLTFLoader.js';
+
+
+export default class Tree extends  THREE.Object3D{
+    constructor() {
+        super();
+
+        const material = new THREE.MeshBasicMaterial({color: 0xffffff})
+
+        const loader= new GLTFLoader();
+        loader.load('./assets/mesh/tree_0.glb', (Object) => {
+
+            Object.scene.children.map((child) =>{
+                var clone;
+
+                if (child.isMesh){
+                    child.scale.set(0.1, 0.1, 0.1);
+                    child.position.set(0,0,0)
+                    child.material = material;
+                    this.add(child);
+                }
+            })
+
+        })
+    }
+}
+
+```
+2.Use one file with all the asset and merge it 
+
+![allObject](assets/doc/allObject.png)
+
+#### Don't forget to set the position of all objects at zero ! ####
+
+```js
+
+import * as THREE from "./lib/three.module.js";
+import {GLTFLoader} from './lib/GLTFLoader.js';
+
+export default class Tree extends  THREE.Object3D{
+    constructor() {
+        super();
+
+        const material = new THREE.MeshBasicMaterial({color: 0xffffff})
+
+        const loader= new GLTFLoader();
+        loader.load('./assets/mesh/AllObject.glb', (Object) => {
+
+            Object.scene.children.map((child) =>{
+                var clone;
+
+                if (child.isMesh){
+
+                    switch (child.name){
+
+                        case "_1_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(0, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_2_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(-5, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_3_tree":
+                            clone = child.clone();
+                            clone.scale.set(1, 1, 1);
+                            clone.position.set(3,-1,0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+                    }
+                }
+            })
+
+        })
+    }
+}
+
+
+```
+
 Note :
 Your 3d model can't have to mush voxel,
 simulation in VDB are not supported
@@ -156,7 +255,7 @@ simulation in VDB are not supported
 
 Now the visual of this commit : 
 
-![Basic setUp](assets/doc/basicSetup3.png "basic setup")
+![Basic setUp](assets/doc/importMultiple%20Object.PNG "basic setup")
 
 Right now it is not very impressive, but it is a good start.
 

@@ -8,17 +8,39 @@ export default class Tree extends  THREE.Object3D{
         const material = new THREE.MeshBasicMaterial({color: 0xffffff})
 
         const loader= new GLTFLoader();
-        loader.load('./assets/mesh/Tree_0.glb', (Object) => {
+        loader.load('./assets/mesh/AllObject.glb', (Object) => {
 
             Object.scene.children.map((child) =>{
+                var clone;
 
                 if (child.isMesh){
-                    console.log("%c Adding :", child.name , "font-size: 20px");
 
-                    child.scale.set(0.1, 0.1, 0.1);
-                    child.position.set(0,0,0)
-                    child.material = material;
-                    this.add(child);
+                    switch (child.name){
+
+                        case "_1_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(0, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_2_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(-5, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_3_tree":
+                            clone = child.clone();
+                            clone.scale.set(1, 1, 1);
+                            clone.position.set(3,-1,0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+                    }
                 }
             })
 
