@@ -5,7 +5,7 @@ export default class Tree extends  THREE.Object3D{
     constructor() {
         super();
 
-        const material = new THREE.MeshBasicMaterial({color: 0xffffff})
+        const material = new THREE.MeshStandardMaterial({color: 0xffffff})
 
         const loader= new GLTFLoader();
         loader.load('./assets/mesh/AllObject.glb', (Object) => {

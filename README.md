@@ -251,12 +251,86 @@ Your 3d model can't have to mush voxel,
 simulation in VDB are not supported
 
 
+## Material and Light
+There is many parameter to create light :
+
+###### #Lights
+[AmbientLight](https://threejs.org/docs/index.html?q=light#api/en/lights/AmbientLight)  
+[AmbientLightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/AmbientLightProbe) 
+[DirectionalLight](https://threejs.org/docs/index.html?q=light#api/en/lights/DirectionalLight)  
+[HemisphereLight](https://threejs.org/docs/index.html?q=light#api/en/lights/HemisphereLight)  
+[HemisphereLightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/HemisphereLightProbe)  
+[Light](https://threejs.org/docs/index.html?q=light#api/en/lights/Light) 
+[LightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/LightProbe)  
+[PointLight](https://threejs.org/docs/index.html?q=light#api/en/lights/PointLight)  
+[RectAreaLight](https://threejs.org/docs/index.html?q=light#api/en/lights/RectAreaLight)  
+[SpotLight](https://threejs.org/docs/index.html?q=light#api/en/lights/SpotLight)
+
+###### #Lights / Shadows
+[LightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/LightShadow)  
+[PointLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/PointLightShadow)  
+[DirectionalLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/DirectionalLightShadow)  
+[SpotLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/SpotLightShadow)  
+
+
+###### # Helpers
+Helper object to assist with visualizing a DirectionalLight's effect on the scene. This consists of plane and a line representing the light's position and direction.
+
+[DirectionalLightHelper](https://threejs.org/docs/#api/en/helpers/DirectionalLightHelper)  
+[HemisphereLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/HemisphereLightHelper)  
+[PointLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/PointLightHelper)  
+[SpotLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/SpotLightHelper)  
+
+
+To add our light we use [DirectionalLight](https://threejs.org/docs/index.html?q=light#api/en/lights/DirectionalLight)  and the [DirectionalLightHelper](https://threejs.org/docs/#api/en/helpers/DirectionalLightHelper)  
+to visualise the light on the viewport.
+
+```js
+initObject(){
+        this.dlight = new THREE.DirectionalLight();
+        this.dlight.position.z = 5;
+        this.dlight.position.y = 5;
+        this.dlight.position.y = 5
+        this.scene.add(this.dlight);
+
+        this.helper = new THREE.DirectionalLightHelper(this.dlight, 1);
+        this.scene.add(this.helper);
+
+        //Other element adding on the scene....
+    }
+```
+
+### Differents material
+we must take care that the material takes into account the lights.
+
+For exemple :
+```js
+                               //👇 no light 🟥
+const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
+                            //👇 light 🟢
+const material = new THREE.MeshStandardMaterial({color: 0xffffff}) 
+```
+
+##### small animation with update()
+```js
+ update(){
+        console.log("update");
+        requestAnimationFrame(this.update);
+
+        // begin animation
+        this.dlight && (this.dlight.position.x += .01);
+        this.helper && this.helper.update();
+        // end animation
+
+        this.renderer.render(this.scene, this.camera);
+        this.Stats.update();
+
+    }
+```
 ***
 
 Now the visual of this commit : 
 
-![Basic setUp](assets/doc/importMultiple%20Object.PNG "basic setup")
-
-Right now it is not very impressive, but it is a good start.
+![Light Objects](assets/doc/lightObjects.PNG "Lighting the scene")
 
 ***

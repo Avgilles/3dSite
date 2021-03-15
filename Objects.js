@@ -7,8 +7,8 @@ export default class Objects extends THREE.Object3D {
         super();
 
         //material 🌈
-        const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
-        const materialColorGreen = new THREE.MeshBasicMaterial({color: 0x00ff00});
+        const materialColor = new THREE.MeshStandardMaterial({color: 0xff00aa});
+        const materialColorGreen = new THREE.MeshStandardMaterial({color: 0x00ff00});
 
         // box 🟥
         this.boxGeometry = new THREE.BoxGeometry(1,1,1);
@@ -25,7 +25,7 @@ export default class Objects extends THREE.Object3D {
         this.planeMesh.rotation.x = THREE.Math.degToRad(-90);
         this.planeMesh.position.y = -1;
 
-        this.boxMesh.position.x =  -1;
+        this.boxMesh.position.set(0,0,3);
 
         // adding to objects class, later in init object we will add this to the scene.
         this.add(this.boxMesh);

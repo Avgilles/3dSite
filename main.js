@@ -50,11 +50,19 @@ export default class Main {
     }
 
     initObject(){
+        this.dlight = new THREE.DirectionalLight();
+        this.dlight.position.z = 5;
+        this.dlight.position.y = 5;
+        this.dlight.position.y = 5
+        this.scene.add(this.dlight);
+
+        this.helper = new THREE.DirectionalLightHelper(this.dlight, 1);
+        this.scene.add(this.helper);
+
+
         this.objects = new Objects();
         this.scene.add(this.objects);
-
         this.tree = new Tree();
-
         this.scene.add(this.tree);
     }
 
@@ -74,7 +82,11 @@ export default class Main {
         console.log("update");
 
         requestAnimationFrame(this.update);
-        // this.cube.rotation.y += 0.01;
+
+        this.dlight && (this.dlight.position.x += .01);
+        this.helper && this.helper.update();
+
+
 
         this.renderer.render(this.scene, this.camera);
 
