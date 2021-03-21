@@ -30,7 +30,7 @@ export default class Main {
 
         // render the shadow 👇
         this.renderer.shadowMap.enabled = true;
-
+        console.log(this.renderer.getMaxAnisotropy);
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         // si le canvas n'est pas spécifié il sera crée automatiquement

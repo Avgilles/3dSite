@@ -9,7 +9,7 @@ export default class Tree extends  THREE.Object3D{
         const material = new THREE.MeshStandardMaterial({color: 0xffffff, side:THREE.DoubleSide})
 
         const loader= new GLTFLoader();
-        loader.load('./assets/mesh/AllObject.glb', (Object) => {
+        loader.load('./assets/meshs/AllObject.glb', (Object) => {
 
             Object.scene.children.map((child) =>{
                 var clone;

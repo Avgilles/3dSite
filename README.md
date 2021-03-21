@@ -365,10 +365,47 @@ constructor(){
 
     }
 ```
+
+## Material
+We can import a texture with material directly.
+```js
+ this.planeMap= new THREE.TextureLoader().load('./assets/textures/yourtextures.jpg');
+```
+Webbrowser doesn't support tiff extention. If you want to use a texture with tiff you must convert it.  
+[link to a convertor](https://tiff2jpg.com/fr/).
+
+we have many parameter to play with the texture :
+```js
+// we can repeat  the texture 
+this.planeMap.wrapS = this.planeMap.wrapT = THREE.RepeatWrapping;
+this.planeMap.repeat.set(5,5);
+
+//we can offset the texture
+
+this.planeMap.offset.set(.2,.2);
+```
+if we want we can animate the texture in the update function.
+```js
+update()
+{
+ this.planeMap.offset.x += .001;
+}
+```
+If we want to have a texture with the more of detail with distance we can use the param "anisotropy" 
+
+```js
+                        //0 ->12
+this.planeMap.anisotropy = 12;
+```
+0.001 anisotropy
+![0.001 anisotropy](./assets/doc/anisotropy0.1.PNG "0.001 anisotropy")
+12 anisotropy
+![12 anisotropy](./assets/doc/anisotropy12.PNG "12 anisotropy")
+
 ***
 
 Now the visual of this commit : 
 
-![Shadow Objects](assets/doc/shadowScene.PNG "shadow in the scene")
+![texture plane](assets/doc/textureplane.PNG "adding a texture on the plane")
 
 ***
