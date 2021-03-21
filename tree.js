@@ -4,8 +4,9 @@ import {GLTFLoader} from './lib/GLTFLoader.js';
 export default class Tree extends  THREE.Object3D{
     constructor() {
         super();
+        this.update = this.update.bind(this);
 
-        const material = new THREE.MeshStandardMaterial({color: 0xffffff})
+        const material = new THREE.MeshStandardMaterial({color: 0xffffff, side:THREE.DoubleSide})
 
         const loader= new GLTFLoader();
         loader.load('./assets/mesh/AllObject.glb', (Object) => {
@@ -22,6 +23,9 @@ export default class Tree extends  THREE.Object3D{
                             clone.scale.set(1,1,1);
                             clone.position.set(0, -1, 0);
                             clone.material = material;
+                            clone.castShadow = true;
+                            clone.receiveShadow = true;
+
                             this.add(clone);
                             break;
 
@@ -30,6 +34,8 @@ export default class Tree extends  THREE.Object3D{
                             clone.scale.set(1,1,1);
                             clone.position.set(-5, -1, 0);
                             clone.material = material;
+                            clone.castShadow = true;
+                            clone.receiveShadow = true;
                             this.add(clone);
                             break;
 
@@ -38,6 +44,9 @@ export default class Tree extends  THREE.Object3D{
                             clone.scale.set(1, 1, 1);
                             clone.position.set(3,-1,0);
                             clone.material = material;
+                            clone.castShadow = true;
+                            clone.receiveShadow = true;
+
                             this.add(clone);
                             break;
                     }
@@ -45,5 +54,9 @@ export default class Tree extends  THREE.Object3D{
             })
 
         })
+    }
+
+    update(){
+
     }
 }

@@ -301,17 +301,55 @@ initObject(){
 ```
 
 ### Differents material
-we must take care that the material takes into account the lights.
+We must take care that the material takes into account the lights.
 
 For exemple :
 ```js
                                //👇 no light 🟥
 const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
-                            //👇 light 🟢
-const material = new THREE.MeshStandardMaterial({color: 0xffffff}) 
+                            //👇 light 🟢   // we add this parameter for the shadow 👇 to emit on the both side
+const material = new THREE.MeshStandardMaterial({color: 0xffffff, side:THREE.DoubleSide}); 
+```
+### Emit the shadow
+We must enabled the shadow in the renderer 
+```js
+  // add this in function init() 
+  // render the shadow 👇
+this.renderer.shadowMap.enabled = true;
+```
+Then we must put on the light th parameter "castshadows" and set the quality of the shadow directly in the parameter light :
+```js
+this.dlight.castShadow = true;
+                                // 👇 good quality
+this.dlight.shadow.mapSize.width = 2048;
+this.dlight.shadow.mapSize.height = 2048;
+// we can put also some blurri effect on the shadow :
+this.dlight.shadow.radius = 3;
+//this param uselful for the both side of the shadow, if we don't put this param, there will have some artefact.
+this.dlight.shadow.bias = -0.00001;
+
+```
+And finally adding on the objects
+```js
+this.yourmesh.receiveShadow = true;
+// if it's a plane you don't have to put this param 👇
+this.yourmesh.castShadow = true;
+
 ```
 
 ##### small animation with update()
+There is 2 important fonction  
+* init function
+* update function
+
+the upadte function is useful for doing animation. It is execute every frame.
+In the constructor we must bind this function, so javascript will understand the this of the function.
+```js
+constructor(){
+        this.update = this.update.bind(this);
+        //[...]
+    }
+```
 ```js
  update(){
         console.log("update");
@@ -331,6 +369,6 @@ const material = new THREE.MeshStandardMaterial({color: 0xffffff})
 
 Now the visual of this commit : 
 
-![Light Objects](assets/doc/lightObjects.PNG "Lighting the scene")
+![Shadow Objects](assets/doc/shadowScene.PNG "shadow in the scene")
 
 ***

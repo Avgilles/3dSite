@@ -27,6 +27,11 @@ export default class Main {
         // 4 param -> lenght of the focale, ratio of the scene (here the size of the window), the clayping (what will be calculated in the scene)
 
         this.renderer = new THREE.WebGLRenderer({antialias:true} /*{alpha:true}*/);
+
+        // render the shadow 👇
+        this.renderer.shadowMap.enabled = true;
+
+
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         // si le canvas n'est pas spécifié il sera crée automatiquement
 
@@ -50,11 +55,27 @@ export default class Main {
     }
 
     initObject(){
+
+        // create a directionnal light
         this.dlight = new THREE.DirectionalLight();
-        this.dlight.position.z = 5;
+        this.dlight.position.x = -3;
         this.dlight.position.y = 5;
-        this.dlight.position.y = 5
+        this.dlight.position.z = 6;
+        this.dlight.castShadow = true;
+        this.dlight.shadow.mapSize.width = 2048;
+        this.dlight.shadow.mapSize.height = 2048;
+        this.dlight.shadow.radius = 3;
+        this.dlight.shadow.bias = -0.00001;
+
         this.scene.add(this.dlight);
+
+        //Create an ambiant light: 2 param , the color and the intensity
+        this.alight= new THREE.AmbientLight();
+        this.alight.intensity = .1;
+        // this.alight.position.set(3,5,-6);
+        this.scene.add(this.alight);
+
+
 
         this.helper = new THREE.DirectionalLightHelper(this.dlight, 1);
         this.scene.add(this.helper);
@@ -83,10 +104,11 @@ export default class Main {
 
         requestAnimationFrame(this.update);
 
-        this.dlight && (this.dlight.position.x += .01);
-        this.helper && this.helper.update();
+        // this.dlight && (this.dlight.position.x += .01);
+        // this.helper && this.helper.update();
 
-
+        this.objects && this.objects.update();
+        this.tree && this.tree.update();
 
         this.renderer.render(this.scene, this.camera);
 
