@@ -21,7 +21,7 @@ export default class Tree extends  THREE.Object3D{
                         case "_1_tree":
                             clone = child.clone();
                             clone.scale.set(1,1,1);
-                            clone.position.set(0, -1, 0);
+                            clone.position.set(0, -1, -3);
                             clone.material = material;
                             clone.castShadow = true;
                             clone.receiveShadow = true;

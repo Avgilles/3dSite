@@ -1,8 +1,10 @@
 import * as THREE from "./lib/three.module.js";
 import {OrbitControls} from "./lib/OrbitControls.js";
 import Stats from "./lib/stats.module.js";
-import Objects from "./Objects.js";
+import {Objects, Pilar} from "./Objects.js";
 import Tree from "./tree.js";
+import Global from './global.js';
+import Light from "./Light.js";
 
 export default class Main {
 
@@ -10,22 +12,19 @@ export default class Main {
 
         this.update = this.update.bind(this);
         this.onResize = this.update.bind(this);
-        // cette methode permet d'utiliser les fonctions des scopes ici.
 
         this.scene;
         this.camera;
         this.renderer;
 
         this.init();
-
     }
 
     init(){
 
         this.scene =  new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, .1, 1000);
         // 4 param -> lenght of the focale, ratio of the scene (here the size of the window), the clayping (what will be calculated in the scene)
-
+        this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, .1, 500);
         this.renderer = new THREE.WebGLRenderer({antialias:true} /*{alpha:true}*/);
 
         // render the shadow 👇
@@ -36,7 +35,9 @@ export default class Main {
         // si le canvas n'est pas spécifié il sera crée automatiquement
 
 
-        this.camera.position.z = 2;
+        this.camera.position.z = 5;
+        this.camera.position.y = 1.5;
+        this.camera.lookAt(0,2,0)
 
 
 
@@ -48,43 +49,33 @@ export default class Main {
 
         this.OrbitControls= new OrbitControls(this.camera, this.renderer.domElement);
 
+        this.scene.fog = new THREE.FogExp2(0x000000, 0.1);
+        this.scene.background = new THREE.Color(0x00000f);
+
+        this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/skydome.jpg", ()=>{
+
+            this.skyEquiMap = new THREE.WebGLCubeRenderTarget(1024).fromEquirectangularTexture(this.renderer, this.skyTexture);
+            Global.instance.envMap = this.skyEquiMap;
+            this.scene.background = this.skyEquiMap;
+
+            this.initObject();
+
+        });
+
 
         this.update();
 
-        this.initObject();
     }
 
     initObject(){
 
-        // create a directionnal light
-        this.dlight = new THREE.DirectionalLight();
-        this.dlight.position.x = -3;
-        this.dlight.position.y = 5;
-        this.dlight.position.z = 6;
-        this.dlight.castShadow = true;
-        this.dlight.shadow.mapSize.width = 2048;
-        this.dlight.shadow.mapSize.height = 2048;
-        this.dlight.shadow.radius = 3;
-        this.dlight.shadow.bias = -0.00001;
-
-        this.scene.add(this.dlight);
-
-        //Create an ambiant light: 2 param , the color and the intensity
-        this.alight= new THREE.AmbientLight();
-        this.alight.intensity = .1;
-        // this.alight.position.set(3,5,-6);
-        this.scene.add(this.alight);
-
-
-
-        this.helper = new THREE.DirectionalLightHelper(this.dlight, 1);
-        this.scene.add(this.helper);
-
-
         this.objects = new Objects();
-        this.scene.add(this.objects);
-        this.tree = new Tree();
-        this.scene.add(this.tree);
+        this.light = new Light();
+        this.scene.add(this.objects, this.light);
+        // this.tree = new Tree();
+        // this.scene.add(this.tree);
+        this.pilar = new Pilar();
+        this.scene.add(this.pilar)
     }
 
     onResize(){
@@ -100,7 +91,7 @@ export default class Main {
 
 
     update(){
-        console.log("update");
+        // console.log("update");
 
         requestAnimationFrame(this.update);
 

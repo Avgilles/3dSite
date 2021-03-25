@@ -1,6 +1,10 @@
 # 3dSite #
 **A short website with tree.js Frameworks**  
-This is the basic setup. 
+
+Now the visual of this commit : 
+
+![sceneCollumn](assets/doc/sceneCollumn.PNG "adding env texture, adding logo + collumn")
+
   
 This is reedmee contain somes informations to remember.
 ***
@@ -58,9 +62,84 @@ export default class Main {
   ```
 
 All the scene will render in a canvas tag, if it's not create three.js will automaticaly create one for you.
+### the scene 
+For setting the background on our scene we use :
+```js
+this.scene.background = new THREE.Color(0x00000f);
 
+```
+Environnement texture :
+```js
+this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/satara_night_1k.jpg", ()=>{
+
+    this.skyEquiMap = new THREE.WebGLCubeRenderTarget(1024).fromEquirectangularTexture(this.renderer, this.skyTexture);
+    this.scene.background = this.skyEquiMap;
+});
+```
+if we want to have some reflexion with the environnement map we can simulte it with it.
+First we create a file were we put all the instance there. The good point to create a new file is that we can use it everywere.
+```js
+class Global{
+
+    /**
+     * Singleton
+     * */
+    constructor() {
+    }
+    get instance() {
+        if(!this._instance){
+            this._instance = {}
+        }
+        return this._instance;
+    }
+
+}
+
+export default new Global();
+```
+
+After imported at the file we want we add a line to our environnement sky.
+```js
+     this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/equi.jpg", ()=>{
+            this.skyEquiMap = new THREE.WebGLCubeRenderTarget(1024).fromEquirectangularTexture(this.renderer, this.skyTexture);
+           
+            Global.instance.envMap = this.skyEquiMap; //👈
+
+            this.scene.background = this.skyEquiMap;
+            //we add our fonction init object in the callback
+            this.initObject();
+        });
+```
+Right now it is working but we dont see any difference. Tht is because we don't set se roughtness and the metalness.
+We add this to our plane
+```js
+//value between 0 -> 1
+materialWhite.roughness = 0.5;
+materialWhite.metalness = 0.1;
+
+materialWhite.envMap = Global.instance.envMap;
+```
+If we want to set the reflexion we can also use : 
+```js
+materialWhite.envMapIntensity = 2;
+```
+The result : 
+![relexion](./assets/doc/reflexion.PNG "Reflexion")
+
+
+
+We can use fog to mask on the loading od the objects.  
+```js
+this.scene.fog = new THREE.FogExp2(0x00000f, 0.1);
+```
+
+if we want to add a texture on our background we can use HDRI Images. we can also use a  cubemap.
+Some site for hdri [here](https://hdrihaven.com/hdris/).
 
 ### Create a object ###
+
+The size of an object doesn't matter for the performance. It is the number of objects.
+
  ```js
 // for sphere
 this.yourSphereGeometry = new THREE.SphereGeometry(1,12,12);
@@ -72,6 +151,44 @@ You can use MeshBasicMaterial to assign a color
  ```js
 const yourMaterialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
 ```
+## Material
+We can import a texture with material directly.
+```js
+ this.planeMap= new THREE.TextureLoader().load('./assets/textures/yourtextures.jpg');
+```
+Webbrowser doesn't support tiff extention. If you want to use a texture with tiff you must convert it.  
+[link to a convertor](https://tiff2jpg.com/fr/).
+
+we have many parameter to play with the texture :
+```js
+// we can repeat  the texture 
+this.planeMap.wrapS = this.planeMap.wrapT = THREE.RepeatWrapping;
+this.planeMap.repeat.set(5,5);
+
+//we can offset the texture
+
+this.planeMap.offset.set(.2,.2);
+```
+if we want we can animate the texture in the update function.
+```js
+update()
+{
+ this.planeMap.offset.x += .001;
+}
+```
+If we want to have a texture with the more of detail with distance we can use the param "anisotropy" 
+
+```js
+                        //0 ->12
+this.planeMap.anisotropy = 12;
+```
+0.001 anisotropy
+![0.001 anisotropy](./assets/doc/anisotropy0.1.PNG "0.001 anisotropy")
+12 anisotropy
+![12 anisotropy](./assets/doc/anisotropy12.PNG "12 anisotropy")
+
+***
+
 ### create the object and place it in to the scene
 ```js
                                  // 👇 the mesh      👇 the material
@@ -174,7 +291,7 @@ export default class Tree extends  THREE.Object3D{
 
                 if (child.isMesh){
                     child.scale.set(0.1, 0.1, 0.1);
-                    child.position.set(0,0,0)
+                    child.position.set(0,0,0);
                     child.material = material;
                     this.add(child);
                 }
@@ -365,47 +482,4 @@ constructor(){
 
     }
 ```
-
-## Material
-We can import a texture with material directly.
-```js
- this.planeMap= new THREE.TextureLoader().load('./assets/textures/yourtextures.jpg');
-```
-Webbrowser doesn't support tiff extention. If you want to use a texture with tiff you must convert it.  
-[link to a convertor](https://tiff2jpg.com/fr/).
-
-we have many parameter to play with the texture :
-```js
-// we can repeat  the texture 
-this.planeMap.wrapS = this.planeMap.wrapT = THREE.RepeatWrapping;
-this.planeMap.repeat.set(5,5);
-
-//we can offset the texture
-
-this.planeMap.offset.set(.2,.2);
-```
-if we want we can animate the texture in the update function.
-```js
-update()
-{
- this.planeMap.offset.x += .001;
-}
-```
-If we want to have a texture with the more of detail with distance we can use the param "anisotropy" 
-
-```js
-                        //0 ->12
-this.planeMap.anisotropy = 12;
-```
-0.001 anisotropy
-![0.001 anisotropy](./assets/doc/anisotropy0.1.PNG "0.001 anisotropy")
-12 anisotropy
-![12 anisotropy](./assets/doc/anisotropy12.PNG "12 anisotropy")
-
-***
-
-Now the visual of this commit : 
-
-![texture plane](assets/doc/textureplane.PNG "adding a texture on the plane")
-
 ***
