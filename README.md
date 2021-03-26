@@ -1,6 +1,10 @@
 # 3dSite #
 **A short website with tree.js Frameworks**  
-This is the basic setup. 
+
+Now the visual of this commit : 
+
+![sceneCollumn](assets/doc/sceneCollumn.PNG "adding env texture, adding logo + collumn")
+
   
 This is reedmee contain somes informations to remember.
 ***
@@ -58,9 +62,84 @@ export default class Main {
   ```
 
 All the scene will render in a canvas tag, if it's not create three.js will automaticaly create one for you.
+### the scene 
+For setting the background on our scene we use :
+```js
+this.scene.background = new THREE.Color(0x00000f);
 
+```
+Environnement texture :
+```js
+this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/satara_night_1k.jpg", ()=>{
+
+    this.skyEquiMap = new THREE.WebGLCubeRenderTarget(1024).fromEquirectangularTexture(this.renderer, this.skyTexture);
+    this.scene.background = this.skyEquiMap;
+});
+```
+if we want to have some reflexion with the environnement map we can simulte it with it.
+First we create a file were we put all the instance there. The good point to create a new file is that we can use it everywere.
+```js
+class Global{
+
+    /**
+     * Singleton
+     * */
+    constructor() {
+    }
+    get instance() {
+        if(!this._instance){
+            this._instance = {}
+        }
+        return this._instance;
+    }
+
+}
+
+export default new Global();
+```
+
+After imported at the file we want we add a line to our environnement sky.
+```js
+     this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/equi.jpg", ()=>{
+            this.skyEquiMap = new THREE.WebGLCubeRenderTarget(1024).fromEquirectangularTexture(this.renderer, this.skyTexture);
+           
+            Global.instance.envMap = this.skyEquiMap; //👈
+
+            this.scene.background = this.skyEquiMap;
+            //we add our fonction init object in the callback
+            this.initObject();
+        });
+```
+Right now it is working but we dont see any difference. Tht is because we don't set se roughtness and the metalness.
+We add this to our plane
+```js
+//value between 0 -> 1
+materialWhite.roughness = 0.5;
+materialWhite.metalness = 0.1;
+
+materialWhite.envMap = Global.instance.envMap;
+```
+If we want to set the reflexion we can also use : 
+```js
+materialWhite.envMapIntensity = 2;
+```
+The result : 
+![relexion](./assets/doc/reflexion.PNG "Reflexion")
+
+
+
+We can use fog to mask on the loading od the objects.  
+```js
+this.scene.fog = new THREE.FogExp2(0x00000f, 0.1);
+```
+
+if we want to add a texture on our background we can use HDRI Images. we can also use a  cubemap.
+Some site for hdri [here](https://hdrihaven.com/hdris/).
 
 ### Create a object ###
+
+The size of an object doesn't matter for the performance. It is the number of objects.
+
  ```js
 // for sphere
 this.yourSphereGeometry = new THREE.SphereGeometry(1,12,12);
@@ -72,6 +151,44 @@ You can use MeshBasicMaterial to assign a color
  ```js
 const yourMaterialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
 ```
+## Material
+We can import a texture with material directly.
+```js
+ this.planeMap= new THREE.TextureLoader().load('./assets/textures/yourtextures.jpg');
+```
+Webbrowser doesn't support tiff extention. If you want to use a texture with tiff you must convert it.  
+[link to a convertor](https://tiff2jpg.com/fr/).
+
+we have many parameter to play with the texture :
+```js
+// we can repeat  the texture 
+this.planeMap.wrapS = this.planeMap.wrapT = THREE.RepeatWrapping;
+this.planeMap.repeat.set(5,5);
+
+//we can offset the texture
+
+this.planeMap.offset.set(.2,.2);
+```
+if we want we can animate the texture in the update function.
+```js
+update()
+{
+ this.planeMap.offset.x += .001;
+}
+```
+If we want to have a texture with the more of detail with distance we can use the param "anisotropy" 
+
+```js
+                        //0 ->12
+this.planeMap.anisotropy = 12;
+```
+0.001 anisotropy
+![0.001 anisotropy](./assets/doc/anisotropy0.1.PNG "0.001 anisotropy")
+12 anisotropy
+![12 anisotropy](./assets/doc/anisotropy12.PNG "12 anisotropy")
+
+***
+
 ### create the object and place it in to the scene
 ```js
                                  // 👇 the mesh      👇 the material
@@ -112,7 +229,7 @@ this.yourMesh.scale.z = Math.Math.degToRad(45);
 ### clone an object
 
 ```js
-this.yourParentMesh = new THREE.Mesh(this.)
+this.yourParentMesh = new THREE.Mesh(this.yourParentMesh);
 ```
 
 ### Visible
@@ -133,12 +250,236 @@ this.groupe.add(this.yourMesh1, this.yourMesh2);
 this.scene.add(this.groupe);
 
 ```
-***
+### import Object 
 
-Now the visual of this commit : 
+There is many format in 3d, the most commun are fbx or obj.
+But there is an extension for the web named "gltf" created for the web.
+On blender we can export directly in the soft. 
+If you don't use blender you can export you 3d model in fbx and converted with online tools :
+[https://blackthread.io/gltf-converter/](https://blackthread.io/gltf-converter/)
 
-![Basic setUp](assets/doc/basicSetup2.png "basic setup")
+We use this extension because is less heavy.
 
-Right now it is not very impressive, but it is a good start.
+In three.js a mesh in gltf is a group of object :
+![Console.log GLTF object](assets/doc/objectMeshgltf.PNG "basic setup")
+There are many option in this object, but now for importing the mesh we use scene/children and we map the all array. 
 
+there is 2 way to organise your asset :
+
+1.Use different file for each object 
+
+![one object](assets/doc/1object.PNG)
+
+#### Don't forget to set the position of the object at zero ! ####
+
+```js
+import * as THREE from "./lib/three.module.js";
+import {GLTFLoader} from './lib/GLTFLoader.js';
+
+
+export default class Tree extends  THREE.Object3D{
+    constructor() {
+        super();
+
+        const material = new THREE.MeshBasicMaterial({color: 0xffffff})
+
+        const loader= new GLTFLoader();
+        loader.load('./assets/mesh/tree_0.glb', (Object) => {
+
+            Object.scene.children.map((child) =>{
+                var clone;
+
+                if (child.isMesh){
+                    child.scale.set(0.1, 0.1, 0.1);
+                    child.position.set(0,0,0);
+                    child.material = material;
+                    this.add(child);
+                }
+            })
+
+        })
+    }
+}
+
+```
+2.Use one file with all the asset and merge it 
+
+![allObject](assets/doc/allObject.png)
+
+#### Don't forget to set the position of all objects at zero ! ####
+
+```js
+
+import * as THREE from "./lib/three.module.js";
+import {GLTFLoader} from './lib/GLTFLoader.js';
+
+export default class Tree extends  THREE.Object3D{
+    constructor() {
+        super();
+
+        const material = new THREE.MeshBasicMaterial({color: 0xffffff})
+
+        const loader= new GLTFLoader();
+        loader.load('./assets/mesh/AllObject.glb', (Object) => {
+
+            Object.scene.children.map((child) =>{
+                var clone;
+
+                if (child.isMesh){
+
+                    switch (child.name){
+
+                        case "_1_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(0, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_2_tree":
+                            clone = child.clone();
+                            clone.scale.set(1,1,1);
+                            clone.position.set(-5, -1, 0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+
+                        case "_3_tree":
+                            clone = child.clone();
+                            clone.scale.set(1, 1, 1);
+                            clone.position.set(3,-1,0);
+                            clone.material = material;
+                            this.add(clone);
+                            break;
+                    }
+                }
+            })
+
+        })
+    }
+}
+
+
+```
+
+Note :
+Your 3d model can't have to mush voxel,
+simulation in VDB are not supported
+
+
+## Material and Light
+There is many parameter to create light :
+
+###### #Lights
+[AmbientLight](https://threejs.org/docs/index.html?q=light#api/en/lights/AmbientLight)  
+[AmbientLightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/AmbientLightProbe) 
+[DirectionalLight](https://threejs.org/docs/index.html?q=light#api/en/lights/DirectionalLight)  
+[HemisphereLight](https://threejs.org/docs/index.html?q=light#api/en/lights/HemisphereLight)  
+[HemisphereLightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/HemisphereLightProbe)  
+[Light](https://threejs.org/docs/index.html?q=light#api/en/lights/Light) 
+[LightProbe](https://threejs.org/docs/index.html?q=light#api/en/lights/LightProbe)  
+[PointLight](https://threejs.org/docs/index.html?q=light#api/en/lights/PointLight)  
+[RectAreaLight](https://threejs.org/docs/index.html?q=light#api/en/lights/RectAreaLight)  
+[SpotLight](https://threejs.org/docs/index.html?q=light#api/en/lights/SpotLight)
+
+###### #Lights / Shadows
+[LightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/LightShadow)  
+[PointLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/PointLightShadow)  
+[DirectionalLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/DirectionalLightShadow)  
+[SpotLightShadow](https://threejs.org/docs/index.html?q=light#api/en/lights/shadows/SpotLightShadow)  
+
+
+###### # Helpers
+Helper object to assist with visualizing a DirectionalLight's effect on the scene. This consists of plane and a line representing the light's position and direction.
+
+[DirectionalLightHelper](https://threejs.org/docs/#api/en/helpers/DirectionalLightHelper)  
+[HemisphereLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/HemisphereLightHelper)  
+[PointLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/PointLightHelper)  
+[SpotLightHelper](https://threejs.org/docs/index.html?q=light#api/en/helpers/SpotLightHelper)  
+
+
+To add our light we use [DirectionalLight](https://threejs.org/docs/index.html?q=light#api/en/lights/DirectionalLight)  and the [DirectionalLightHelper](https://threejs.org/docs/#api/en/helpers/DirectionalLightHelper)  
+to visualise the light on the viewport.
+
+```js
+initObject(){
+        this.dlight = new THREE.DirectionalLight();
+        this.dlight.position.z = 5;
+        this.dlight.position.y = 5;
+        this.dlight.position.y = 5
+        this.scene.add(this.dlight);
+
+        this.helper = new THREE.DirectionalLightHelper(this.dlight, 1);
+        this.scene.add(this.helper);
+
+        //Other element adding on the scene....
+    }
+```
+
+### Differents material
+We must take care that the material takes into account the lights.
+
+For exemple :
+```js
+                               //👇 no light 🟥
+const materialColor = new THREE.MeshBasicMaterial({color: 0xff00aa});
+                            //👇 light 🟢   // we add this parameter for the shadow 👇 to emit on the both side
+const material = new THREE.MeshStandardMaterial({color: 0xffffff, side:THREE.DoubleSide}); 
+```
+### Emit the shadow
+We must enabled the shadow in the renderer 
+```js
+  // add this in function init() 
+  // render the shadow 👇
+this.renderer.shadowMap.enabled = true;
+```
+Then we must put on the light th parameter "castshadows" and set the quality of the shadow directly in the parameter light :
+```js
+this.dlight.castShadow = true;
+                                // 👇 good quality
+this.dlight.shadow.mapSize.width = 2048;
+this.dlight.shadow.mapSize.height = 2048;
+// we can put also some blurri effect on the shadow :
+this.dlight.shadow.radius = 3;
+//this param uselful for the both side of the shadow, if we don't put this param, there will have some artefact.
+this.dlight.shadow.bias = -0.00001;
+
+```
+And finally adding on the objects
+```js
+this.yourmesh.receiveShadow = true;
+// if it's a plane you don't have to put this param 👇
+this.yourmesh.castShadow = true;
+
+```
+
+##### small animation with update()
+There is 2 important fonction  
+* init function
+* update function
+
+the upadte function is useful for doing animation. It is execute every frame.
+In the constructor we must bind this function, so javascript will understand the this of the function.
+```js
+constructor(){
+        this.update = this.update.bind(this);
+        //[...]
+    }
+```
+```js
+ update(){
+        console.log("update");
+        requestAnimationFrame(this.update);
+
+        // begin animation
+        this.dlight && (this.dlight.position.x += .01);
+        this.helper && this.helper.update();
+        // end animation
+
+        this.renderer.render(this.scene, this.camera);
+        this.Stats.update();
+
+    }
+```
 ***
