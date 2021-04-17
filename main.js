@@ -10,8 +10,20 @@ export default class Main {
 
     constructor(){
 
+
         this.update = this.update.bind(this);
-        this.onResize = this.update.bind(this);
+        this.onResize = this.onResize.bind(this);
+        this.initEvents = this.initEvents.bind(this);
+
+        //interaction
+        this.onMove = this.onMove.bind(this);
+        this.onUp = this.onUp.bind(this);
+        this.onDown = this.onDown.bind(this);
+
+        this.findIntersection = this.findIntersection.bind(this);
+
+        this.mouse = new THREE.Vector2();
+        this.raycaster = new THREE.Raycaster();
 
         this.scene;
         this.camera;
@@ -36,7 +48,8 @@ export default class Main {
 
 
         this.camera.position.z = 5;
-        this.camera.position.y = 1.5;
+        // this.camera.position.y = 1.5;
+        this.camera.position.y = 0;
         this.camera.lookAt(0,2,0)
 
 
@@ -48,9 +61,9 @@ export default class Main {
         document.body.appendChild(this.Stats.dom);
 
         this.OrbitControls= new OrbitControls(this.camera, this.renderer.domElement);
-
-        this.scene.fog = new THREE.FogExp2(0x000000, 0.1);
-        this.scene.background = new THREE.Color(0x00000f);
+        // this.scene.add(this.camera, this.renderer.domElement);
+        // this.scene.fog = new THREE.FogExp2(0x000000, 0.1);
+        // this.scene.background = new THREE.Color(0x00000f);
 
         this.skyTexture =  new THREE.TextureLoader().load("./assets/textures/skydome.jpg", ()=>{
 
@@ -64,10 +77,12 @@ export default class Main {
 
 
         this.update();
+        this.initEvents();
 
     }
 
     initObject(){
+
 
         this.objects = new Objects();
         this.light = new Light();
@@ -75,6 +90,7 @@ export default class Main {
         // this.tree = new Tree();
         // this.scene.add(this.tree);
         this.pilar = new Pilar();
+
         this.scene.add(this.pilar)
     }
 
@@ -89,6 +105,37 @@ export default class Main {
 
     }
 
+    initEvents(){
+        this.renderer.domElement.addEventListener("mousemove", this.onMove, false);
+        document.body.addEventListener("pointerdown", this.onDown, false);
+        document.body.addEventListener("pointerup", this.onUp, false);
+    }
+    onMove(event){
+        event.preventDefault();
+        this.mouse.x = (event.clientX / window.innerWidth)*2 - 1;
+        this.mouse.y = (event.clientY / window.innerHeight)*2 + 1;
+
+    }
+    onDown(event){
+        event.preventDefault();
+    }
+    onUp(event){
+        event.preventDefault();
+    }
+
+    findIntersection(){
+        this.camera.updateMatrixWorld();
+
+        // this.raycaster.setFromCamera(this.mouse, this.camera);
+        // console.log(this.raycaster);
+        //
+        // const intersects = this.raycaster.intersectObject(this.pilar.children);
+        // console.log(intersects);
+        //
+        // if(intersects.length > 0){
+        //     console.log(intersects[0].object.name);
+        // }
+    }
 
     update(){
         // console.log("update");
@@ -99,7 +146,12 @@ export default class Main {
         // this.helper && this.helper.update();
 
         this.objects && this.objects.update();
-        this.tree && this.tree.update();
+        this.objects && this.findIntersection();
+
+        // console.log(this.mouse);
+
+
+        // this.tree && this.tree.update();
 
         this.renderer.render(this.scene, this.camera);
 
