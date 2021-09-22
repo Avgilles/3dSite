@@ -30,8 +30,8 @@ export default class Light extends THREE.Light {
         /** Create an ambiant light: 2 param , the color and the intensity */
         this.alight = new THREE.AmbientLight();
         this.alight.intensity = .1;
-        this.helper = new THREE.DirectionalLightHelper(this.dlightL, 1);
-        this.clonedhelper = new THREE.DirectionalLightHelper(this.dlightR, 1);
+        // this.helper = new THREE.DirectionalLightHelper(this.dlightL, 1);
+        // this.clonedhelper = new THREE.DirectionalLightHelper(this.dlightR, 1);
 
 
         /** Rectlight */
