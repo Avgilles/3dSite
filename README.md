@@ -1,9 +1,7 @@
 # 3dSite #
 **A short website with tree.js Frameworks**  
 
-Now the visual of this commit : 
-
-![sceneCollumn](assets/doc/sceneCollumn.PNG "adding env texture, adding logo + collumn")
+![preview](preview/preview.gif "adding env texture, adding logo + collumn")
 
   
 This is reedmee contain somes informations to remember.
