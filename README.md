@@ -483,3 +483,33 @@ constructor(){
     }
 ```
 ***
+### Interaction with user
+Three.js doesn't add interaction with the user natively, we must simulate it.
+On the main.js we add 3 fonctions onMove, onUp, onDown.
+
+```js
+initEvents(){
+    this.renderer.domElement.addEventListener("mousemove", this.onMove, false);
+    document.body.addEventListener("pointerdown", this.onDown, false);
+    document.body.addEventListener("pointerup", this.onUp, false);
+}
+onMove(event){
+    console.log("onMouve");
+}
+onDown(event){
+    console.log("onDown");
+}
+onUp(event){
+    console.log("onUp");
+}
+```
+Don't forgot to bind our function in the constructor
+```js
+ constructor(){
+//[...]
+    this.onMove = this.onMove.bind(this);
+    this.onUp = this.onUp.bind(this);
+    this.onDown = this.onDown.bind(this);
+//[...]
+}
+```

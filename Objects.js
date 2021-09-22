@@ -2,23 +2,35 @@ import * as THREE from "./lib/three.module.js";
 import tree from "./tree.js";
 import Global from "./global.js";
 import {GLTFLoader} from './lib/GLTFLoader.js';
+import { GUI } from './lib/dat.gui.module.js';
 
+
+let particulesPilar;
 
 export class Objects extends THREE.Object3D {
 
     constructor(){
         super();
         this.update = this.update.bind(this);
+        this.init();
+    }
 
+    init(){
         const material = new THREE.MeshBasicMaterial({color: 0xffffff})
-        const loader = new GLTFLoader();
-        loader.load('./assets/meshs/avLogo.glb', (Object) =>{
-            var Logo = Object.scene.children[0];
-            Logo.scale.set(10,10,10);
-            Logo.position.set(-0.66,0,0);
-            Logo.material = material;
-            this.add(Logo);
+        this.loader = new GLTFLoader();
+        this.loader.load('./assets/meshs/avLogo.glb', (Object) =>{
+            this.Logo = Object.scene.children[0];
+            this.Logo.scale.set(10,10,10);
+            this.Logo.position.set(-0.66,0,0);
+            this.Logo.material = material;
+            this.add(this.Logo);
         });
+        console.log("loader :");
+        console.log(this.loader);
+
+        // this.gui = new dat.GUI();
+        // gui.add()
+
 
         // plane 🔳
         const materialWhite = new THREE.MeshStandardMaterial({color: 0xffffff});
@@ -46,10 +58,13 @@ export class Objects extends THREE.Object3D {
         this.planeMesh.rotation.x = THREE.Math.degToRad(-90);
         this.planeMesh.position.y = -1;
         this.planeMesh.receiveShadow = true;
+        this.planeMesh.name= "planSol";
 
+        console.log(this.planeMesh);
         this.planeUp = this.planeMesh.clone();
         this.planeUp.position.y = 6;
         this.planeUp.rotation.x = THREE.Math.degToRad(90);
+        this.planeUp.name = "planeUp";
         // box 🟥
         this.boxGeometry = new THREE.BoxGeometry(100,6,.5);
         const materialColor = new THREE.MeshStandardMaterial({color: 0x000000 , side: THREE.DoubleSide});
@@ -58,14 +73,17 @@ export class Objects extends THREE.Object3D {
         this.boxMesh.position.set(0,2,-8);
         this.boxMesh.receiveShadow = true;
         this.boxMesh.castShadow = true;
+        this.boxMesh.name = "fondNoir";
+
 
 
         this.add(this.boxMesh, this.planeMesh,this.planeUp);
-
     }
 
     update(){
-        // this.boxMesh.rotation.x += THREE.Math.degToRad(.03);
+        // this.Logo = this.Logo.bind(this);
+        //
+        // this.Logo.rotation.x += THREE.Math.degToRad(.03);
         // this.boxMesh.rotation.y += THREE.Math.degToRad(.01);
         // this.planeMap.offset.y += .001;
 
@@ -75,10 +93,17 @@ export class Pilar extends  THREE.Object3D{
     constructor() {
         super();
         this.update = this.update.bind(this);
+        this.init();
 
+    }
+
+        init(){
         const material = new THREE.MeshStandardMaterial({color: 0xffffff, side:THREE.DoubleSide})
         material.map = new THREE.TextureLoader().load("./assets/textures/pilar/diffuse.jpg");
-
+        const particulesMaterial = new THREE.PointsMaterial({
+            size: 0.005,
+            color:"#1084ff"
+        });
 
         const loader= new GLTFLoader();
         loader.load('./assets/meshs/pillar.glb', (Object) => {
@@ -87,6 +112,7 @@ export class Pilar extends  THREE.Object3D{
                 if (child.isMesh){
                     const pillar = child.clone();
                     pillar.scale.set(.2,.4,.3);
+
                     pillar.material = material;
                     pillar.castShadow = true;
                     pillar.receiveShadow = true;
@@ -103,19 +129,35 @@ export class Pilar extends  THREE.Object3D{
                         i++;
                     }
                     const pillarM = pillar.clone();
-                    pillarM.position.set(0,-1, 0);
+
+                    pillarM.materials = particulesMaterial;
+                    pillarM.position.set(0,-1.5, 0);
                     pillarM.scale.set(.4,.15,.4);
 
 
                     this.add(pillarM);
 
+                    const geo = new THREE.SphereGeometry(1,1,800,10, 10, 10,10 )
+
+                    particulesPilar = new THREE.Points(geo , particulesMaterial);
+                    particulesPilar.position.set(0, .75,0);
+
+                    // particulesPilar.scale.set(0, -1,0);
+
+                    this.add(particulesPilar);
+
                 }
             })
 
         })
+        this.update();
     }
 
     update(){
+
+        requestAnimationFrame(this.update);
+
+        particulesPilar && (particulesPilar.rotation.y += .01);
 
     }
 }
